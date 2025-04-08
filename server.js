@@ -7,6 +7,8 @@ const { connectDB } = require('./config/connection');
 // Import directly as a function
 var indexRouter = require('./routes/index');
 var adminRouter = require('./routes/admin');
+require('dotenv').config();
+
 
 var app = express();
 
