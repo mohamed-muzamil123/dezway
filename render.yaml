@@ -4,9 +4,9 @@ services:
     env: node
     plan: free
     buildCommand: npm install
-    startCommand: node server.js
+    startCommand: node app.js
     envVars:
       - key: MONGO_URI
-        sync: false
+        value: mongodb+srv://hafilmuz:Muz%402007@dezway.62eaxfi.mongodb.net/
       - key: PORT
         value: 10000
