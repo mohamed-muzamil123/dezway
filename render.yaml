@@ -4,7 +4,7 @@ services:
     env: node
     plan: free
     buildCommand: npm install
-    startCommand: node app.js
+    startCommand: node server.js
     envVars:
       - key: MONGO_URI
         value: mongodb+srv://hafilmuz:Muz%402007@dezway.62eaxfi.mongodb.net/
