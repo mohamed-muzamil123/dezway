@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dezway - Design Invoice</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6C5CE7; /* Creative purple - change to Dezway's brand color */
+            --secondary: #00CEFF;
+        }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .invoice-container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .invoice-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .logo {
+            max-width: 140px;
+            margin-bottom: 15px;
+        }
+        .invoice-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        .client-info {
+            background: #F8F9FF;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .service-item {
+            border-bottom: 1px dashed #eee;
+            padding: 15px 0;
+        }
+        .payment-fee {
+            background: #FFF8E1;
+            border-left: 4px solid #FFC107;
+            padding: 10px;
+            border-radius: 0 5px 5px 0;
+        }
+        .payment-option {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .payment-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        .qr-code {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            border: 1px solid #eee;
+        }
+        .total-box {
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        /* UPI Button Styles */
+.btn-upi {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s;
+    border: 1px solid #dee2e6;
+    margin-bottom: 10px;
+}
+
+.btn-upi:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-upi img {
+    margin-right: 10px;
+    height: 24px;
+}
+
+
+
+  .copy-field {
+        background: #f8f9fa;
+        padding: 8px 12px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .copy-btn {
+        padding: 2px 8px;
+        font-size: 0.8rem;
+        position: relative;
+    }
+    .copy-tooltip {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--primary);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
+    .copy-tooltip:after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px 5px 0;
+        border-style: solid;
+        border-color: var(--primary) transparent transparent;
+    }
+    .copied .copy-tooltip {
+        opacity: 1;
+        visibility: visible;
+        top: -35px;
+    }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="invoice-container">
+            <!-- Header with Logo -->
+            <div class="invoice-header">
+                <img src="/images/logo.jpeg" alt="Dezway Logo" class="logo">
+                <h1>INVOICE</h1>
+                <p class="mb-0">Digital Design Solutions</p>
+            </div>
+            
+            <!-- Invoice Body -->
+            <div class="p-4 p-md-5">
+                <!-- Invoice Info -->
+                <div class="d-flex justify-content-between mb-4">
+                    <div>
+                        <h5 class="fw-bold">Invoice #DW-<span id="invoiceNo">{{client.clientCode}}</span></h5>
+                        <p class="text-muted mb-1">Date: <span id="invoiceDate">{{client.date}}</span></p>
+                      
+                    </div>
+                    <div class="text-end">
+                        <h5 class="fw-bold">Dezway Designs</h5>
+                        <p class="text-muted mb-1">dezwaydesigns@gmail.com</p>
+                        <p class="text-muted"></p>
+                    </div>
+                </div>
+                
+                <!-- Client Info -->
+                <div class="client-info">
+                    <h5 class="fw-bold mb-3">BILL TO</h5>
+                    <p class="mb-1 fw-bold" id="clientName">{{client.client}}</p>
+                    <p class="mb-0 text-muted" id="clientPhone">+91{{client.contact}}</p>
+                </div>
+                
+                <!-- Services Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>DESCRIPTION</th>
+                                <th class="text-end">HOURS/QTY</th>
+                               
+                                <th class="text-end">AMOUNT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="service-item">
+                                <td>
+                                    <strong>{{client.description}}</strong><br>
+                                    <small class="text-muted">Custom  creation with  concepts</small>
+                                </td>
+                                <td class="text-end">1</td>
+                              
+                                <td class="text-end">{{client.amount}}</td>
+                            </tr>
+                          
+                            <tr class="payment-fee">
+                                <td colspan="3" class="text-end">
+                                    <strong>Digital Payment Convenience Fee (3%)</strong><br>
+                                    <small class="text-muted">For instant online payment</small>
+                                     <strong>₹50.00</strong>
+                                </td>
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Total -->
+                <div class="total-box text-end mb-4">
+                    <h4 class="mb-0">TOTAL DUE: {{totalAmount}}</h4>
+                </div>
+<!-- Payment Options -->
+<h4 class="fw-bold mb-3">Payment Methods</h4>
+
+<div class="row">
+    <!-- QR Payment -->
+  <div class="col-12 col-md-6 mb-4">
+    <div class="payment-option h-100">
+        <div class="d-flex align-items-center mb-3">
+            <i class="fas fa-qrcode fa-2x me-3" style="color: var(--primary);"></i>
+            <div>
+                <h5 class="mb-1">QR Code Payment</h5>
+                <p class="text-muted mb-0">Scan & pay instantly</p>
+            </div>
+        </div>
+        <div class="text-center" id="qrSection">
+            <div class="qr-code mb-2 mx-auto" style="max-width: 150px;">
+                <img src="/images/qr.jpeg" alt="QR Code" class="img-fluid">
+            </div>
+            
+            <!-- Copyable Payment Details -->
+            <div class="payment-details mt-3">
+                <div class="copy-field mb-2 position-relative">
+                    <span class="fw-bold">UPI ID:</span> 
+                    <span id="upiId">313mohdalisaqafi@oksbi</span>
+                    <button class="btn btn-sm btn-outline-primary ms-2 copy-btn" data-target="upiId">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                    <div class="copy-tooltip">Copied!</div>
+                </div>
+                <div class="copy-field position-relative">
+                    <span class="fw-bold">Phone:</span> 
+                    <span id="phoneNumber">9744748642</span>
+                    <button class="btn btn-sm btn-outline-primary ms-2 copy-btn" data-target="phoneNumber">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                    <div class="copy-tooltip">Copied!</div>
+                </div>
+            </div>
+            
+            <small class="text-muted mt-2 d-block">Scan with any UPI</small>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    document.querySelectorAll('.copy-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const textToCopy = document.getElementById(targetId).textContent;
+            const parentField = this.closest('.copy-field');
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // Show tooltip
+                parentField.classList.add('copied');
+                
+                // Remove after 2 seconds
+                setTimeout(() => {
+                    parentField.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    parentField.classList.add('copied');
+                    setTimeout(() => {
+                        parentField.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Fallback copy failed: ', err);
+                }
+                document.body.removeChild(textArea);
+            });
+        });
+    });
+</script>
+
+    <!-- UPI Apps -->
+    <div class="col-12 col-md-6 mb-4">
+        <div class="payment-option h-100">
+            <div class="d-flex align-items-center mb-3">
+                <i class="fas fa-mobile-alt fa-2x me-3" style="color: var(--primary);"></i>
+                <div>
+                    <h5 class="mb-1">UPI Payment</h5>
+                    <p class="text-muted mb-0">Pay via your favorite app</p>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <!-- Google Pay -->
+                <a href="upi://pay?pa=313mohdalisaqafi@oksbi&pn=Muhammed%20Ali%20Squafi&am={{totalAmount}}&cu=INR&tn=Payment%20for%20Invoice%20DW-{{client.clientCode}}" 
+                   class="btn btn-upi text-start py-2">
+                    <img src="https://www.gstatic.com/instantbuy/svg/dark_gpay.svg" height="24" class="me-2">
+                    Pay with Google Pay
+                </a>
+                
+                <!-- PhonePe -->
+                <a href="upi://pay?pa=313mohdalisaqafi@oksbi&pn=Muhammed%20Ali%20Squafi&am={{totalAmount}}&cu=INR&tn=Payment%20for%20Invoice%20DW-{{client.clientCode}}" 
+                   class="btn btn-upi text-start py-2">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAMAAACfWMssAAAAZlBMVEVfJZ////9RAJji2+1XEJu2o9C+rtXv6/Wum8u5qdJaGp1eI5/p5PHSx+JcIJ6QcbqtmMtIAJRkLaLIutvWzOXa0eapksh6Uq3Lv96ljcaWer2dgsF0SaqIZ7V5T61uPqf28/lpNqVFclM3AAABMklEQVRIie3W206DQBAG4OVnKXQHllOlKLbW939JgRlNUMEdrjT2v2KTfoHOgWDMPbqQA2D1DijbNM9ASmeLaM4JWhgzjA5KSXgQ2amlPGxUKitE6EWenU4atCIbr5UHhqnVNgUJy1jdTlQse207DR5ZJgHSLlI/sRwwnbaq5LpkkUomYT6c13vqn6OtXFZ76q+bsFj9r/5lJzQf0/1tNtaM7JBJQW5dNkVO6XS6btSVnMWRf1rPHZFTXP/QjzFWID+X5ZGNQ2bgDn8V7HjA+F2jgK5kyEukgP6VYUrT3tfh0CCXbWirqpXrIOiGrxsVBA3indA3t33QePP5noHQeFyK+a75sVfBsUKAa8hC0473EJFqAJb5SzDZCamZYa6G47IciuJUaj8+JmnHD8Id7l/nDZc2DQQtoLcWAAAAAElFTkSuQmCC" height="24" class="me-2">
+                    Pay with PhonePe
+                </a>
+                
+                <!-- Paytm -->
+                <a href="upi://pay?pa=313mohdalisaqafi@oksbi&pn=Muhammed%20Ali%20Squafi&am={{totalAmount}}&cu=INR&tn=Payment%20for%20Invoice%20DW-{{client.clientCode}}" 
+                   class="btn btn-upi text-start py-2">
+                    <img src="https://pwebassets.paytm.com/commonwebassets/paytmweb/header/images/logo.svg" height="24" class="me-2">
+                    Pay with Paytm
+                </a>
+            </div>
+        </div>
+    </div>
+</div> 
+                <!-- Notes -->
+                <div class="border-top pt-3 mt-4">
+                  
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+   
+<script>
+    const totalAmount = {{totalAmount}}; // value from Node.js
+    const upiId = "samadmkd786@okaxis";
+    const name = "Abdul Samad M.K";
+
+    document.getElementById("gpayBtn").addEventListener("click", () => {
+        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${totalAmount}&cu=INR`;
+        window.location.href = upiLink;
+    });
+</script>
+
+</body>
+</html>
