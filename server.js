@@ -10,6 +10,8 @@ var adminRouter = require('./routes/admin');
 require('dotenv').config();
 
 
+
+
 var app = express();
 
 //CHATGPT GIVE INSTRUCTIONS
@@ -80,5 +82,14 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+// your middlewares, routes, view engine setup, etc.
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+})
 
 module.exports = app;
